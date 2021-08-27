@@ -8,12 +8,12 @@ AS86	=as86 -0 -a
 LD86	=ld86 -0
 
 AS	=gcc -c -m32
-LD	=ld
+LD	=ld -m elf_i386 -e startup_32
 LDFLAGS	=-s -x -M
 CC	=gcc -m32  $(RAMDISK)
 CFLAGS	=-Wall -O -fstrength-reduce -fomit-frame-pointer \
  
-CPP	=cpp -nostdinc -Iinclude
+CPP	=gcc -nostdinc -Iinclude
 
 #
 # ROOT_DEV specifies the default root-device when making the image.

@@ -8,7 +8,7 @@
 
 AR	=ar
 AS	=gcc -c -m32
-LD	=ld
+LD	=ld -m elf_i386
 LDFLAGS	=-s -x
 CC	=gcc -m32 
 CFLAGS	=-Wall -O -fstrength-reduce -fomit-frame-pointer  \

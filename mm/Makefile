@@ -3,7 +3,7 @@ CFLAGS	=-O -Wall -fstrength-reduce  -fomit-frame-pointer \
 	-finline-functions -nostdinc -I../include
 AS	=gcc -c -m32
 AR	=ar
-LD	=ld
+LD	=ld -m elf_i386
 CPP	=gcc -E -nostdinc -I../include
 
 .c.o:

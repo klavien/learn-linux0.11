@@ -8,7 +8,7 @@
 
 AR	=ar
 AS	=gcc -c -m32
-LD	=ld
+LD	=ld -m elf_i386
 LDFLAGS	=-s -x
 CC	=gcc -m32 
 CFLAGS	=-Wall -O -fstrength-reduce -fomit-frame-pointer  \
@@ -31,8 +31,8 @@ chr_drv.a: $(OBJS)
 	$(AR) rcs chr_drv.a $(OBJS)
 	sync
 
-keyboard.s: keyboard.S ../../include/linux/config.h
-	$(CPP) -traditional keyboard.S -o keyboard.s
+keyboard.s: keyboard1.S ../../include/linux/config.h
+	$(CPP) -traditional keyboard1.S -o keyboard.s
 
 clean:
 	rm -f core *.o *.a tmp_make keyboard.s
