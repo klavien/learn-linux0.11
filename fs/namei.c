@@ -252,11 +252,11 @@ static struct m_inode * get_dir(const char * pathname)
 			iput(inode);
 			return NULL;
 		}
-		for(namelen=0;(c=get_fs_byte(pathname++))&&(c!='/');namelen++)
+		for(namelen=0;(c=get_fs_byte(pathname++))&&(c!='/');namelen++) // find next '/'
 			/* nothing */ ;
 		if (!c)
 			return inode;
-		if (!(bh = find_entry(&inode,thisname,namelen,&de))) {
+		if (!(bh = find_entry(&inode,thisname,namelen,&de))) { // find next level dirname
 			iput(inode);
 			return NULL;
 		}
@@ -285,7 +285,7 @@ static struct m_inode * dir_namei(const char * pathname,
 	if (!(dir = get_dir(pathname)))
 		return NULL;
 	basename = pathname;
-	while (c=get_fs_byte(pathname++))
+	while (c=get_fs_byte(pathname++)) // loop, find the last slash
 		if (c=='/')
 			basename=pathname;
 	*namelen = pathname-basename-1;

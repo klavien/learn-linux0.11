@@ -50,7 +50,7 @@ extern void mem_use(void);
 extern int timer_interrupt(void);
 extern int system_call(void);
 
-union task_union {
+union task_union { // 保证一个task_struct结构占用4k空间
 	struct task_struct task;
 	char stack[PAGE_SIZE];
 };

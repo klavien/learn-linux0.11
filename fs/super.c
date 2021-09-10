@@ -60,9 +60,9 @@ struct super_block * get_super(int dev)
 	if (!dev)
 		return NULL;
 	s = 0+super_block;
-	while (s < NR_SUPER+super_block)
+	while (s < NR_SUPER+super_block) // traverse the 8 super blocks to find it.
 		if (s->s_dev == dev) {
-			wait_on_super(s);
+			wait_on_super(s); // lock it.
 			if (s->s_dev == dev)
 				return s;
 			s = 0+super_block;
@@ -108,8 +108,8 @@ static struct super_block * read_super(int dev)
 	check_disk_change(dev);
 	if (s = get_super(dev))
 		return s;
-	for (s = 0+super_block ;; s++) {
-		if (s >= NR_SUPER+super_block)
+	for (s = 0+super_block ;; s++) {  // if not get the super block, find an empty one.
+		if (s >= NR_SUPER+super_block) // if all 8 super block are all used, return null.
 			return NULL;
 		if (!s->s_dev)
 			break;
@@ -121,13 +121,13 @@ static struct super_block * read_super(int dev)
 	s->s_rd_only = 0;
 	s->s_dirt = 0;
 	lock_super(s);
-	if (!(bh = bread(dev,1))) {
+	if (!(bh = bread(dev,1))) { // read the first block.
 		s->s_dev=0;
 		free_super(s);
 		return NULL;
 	}
 	*((struct d_super_block *) s) =
-		*((struct d_super_block *) bh->b_data);
+		*((struct d_super_block *) bh->b_data); // the first block has fs info int it.
 	brelse(bh);
 	if (s->s_magic != SUPER_MAGIC) {
 		s->s_dev = 0;
@@ -253,7 +253,7 @@ void mount_root(void)
 		printk("Insert root floppy and press ENTER");
 		wait_for_keypress();
 	}
-	for(p = &super_block[0] ; p < &super_block[NR_SUPER] ; p++) {
+	for(p = &super_block[0] ; p < &super_block[NR_SUPER] ; p++) { // init 8 super blocks.
 		p->s_dev = 0;
 		p->s_lock = 0;
 		p->s_wait = NULL;

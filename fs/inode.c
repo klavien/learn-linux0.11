@@ -47,11 +47,11 @@ void invalidate_inodes(int dev)
 
 	inode = 0+inode_table;
 	for(i=0 ; i<NR_INODE ; i++,inode++) {
-		wait_on_inode(inode);
+		wait_on_inode(inode); // inode shuld not be locked.
 		if (inode->i_dev == dev) {
 			if (inode->i_count)
 				printk("inode in use on removed disk\n\r");
-			inode->i_dev = inode->i_dirt = 0;
+			inode->i_dev = inode->i_dirt = 0; // i_dirt==0,means inode can be reuse.
 		}
 	}
 }
@@ -260,7 +260,7 @@ struct m_inode * iget(int dev,int nr)
 			continue;
 		}
 		inode->i_count++;
-		if (inode->i_mount) {
+		if (inode->i_mount) { // has mounted on some devices.
 			int i;
 
 			for (i = 0 ; i<NR_SUPER ; i++)

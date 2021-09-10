@@ -87,7 +87,7 @@ int new_block(int dev)
 				break;
 	if (i>=8 || !bh || j>=8192)
 		return 0;
-	if (set_bit(j,bh->b_data))
+	if (set_bit(j,bh->b_data)) // set the bit of position j and return the original bit value.
 		panic("new_block: bit already set");
 	bh->b_dirt = 1;
 	j += i*8192 + sb->s_firstdatazone-1;

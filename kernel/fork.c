@@ -136,12 +136,12 @@ int find_empty_process(void)
 {
 	int i;
 
-	repeat:
+	repeat: // find a pid which not be used.
 		if ((++last_pid)<0) last_pid=1;
 		for(i=0 ; i<NR_TASKS ; i++)
 			if (task[i] && task[i]->pid == last_pid) goto repeat;
 	for(i=1 ; i<NR_TASKS ; i++)
-		if (!task[i])
+		if (!task[i])	// get a task position which not be used.
 			return i;
 	return -EAGAIN;
 }

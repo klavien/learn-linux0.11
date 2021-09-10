@@ -40,9 +40,9 @@ static inline volatile void oom(void)
 __asm__("movl %%eax,%%cr3"::"a" (0))
 
 /* these are not to be changed without changing head.s etc */
-#define LOW_MEM 0x100000
-#define PAGING_MEMORY (15*1024*1024)
-#define PAGING_PAGES (PAGING_MEMORY>>12)
+#define LOW_MEM (1<<20) // 1M
+#define PAGING_MEMORY (15*1024*1024) // 15M
+#define PAGING_PAGES (PAGING_MEMORY>>12) // 15M/4K
 #define MAP_NR(addr) (((addr)-LOW_MEM)>>12)
 #define USED 100
 
@@ -62,7 +62,7 @@ static unsigned char mem_map [ PAGING_PAGES ] = {0,};
  */
 unsigned long get_free_page(void)
 {
-register unsigned long __res asm("ax");
+register unsigned long __res;
 
 __asm__("std ; repne ; scasb\n\t"
 	"jne 1f\n\t"
@@ -204,9 +204,9 @@ unsigned long put_page(unsigned long page,unsigned long address)
 		printk("Trying to put page %p at %p\n",page,address);
 	if (mem_map[(page-LOW_MEM)>>12] != 1)
 		printk("mem_map disagrees with %p at %p\n",page,address);
-	page_table = (unsigned long *) ((address>>20) & 0xffc);
+	page_table = (unsigned long *) ((address>>20) & 0xffc); //page_dir actually page_table is page_dir here!
 	if ((*page_table)&1)
-		page_table = (unsigned long *) (0xfffff000 & *page_table);
+		page_table = (unsigned long *) (0xfffff000 & *page_table); // page_table
 	else {
 		if (!(tmp=get_free_page()))
 			return 0;
@@ -296,17 +296,17 @@ static int try_to_share(unsigned long address, struct task_struct * p)
 	unsigned long from_page;
 	unsigned long to_page;
 	unsigned long phys_addr;
-
+	// address is a difference between real address and start_code.
 	from_page = to_page = ((address>>20) & 0xffc);
-	from_page += ((p->start_code>>20) & 0xffc);
-	to_page += ((current->start_code>>20) & 0xffc);
+	from_page += ((p->start_code>>20) & 0xffc); // actually, this is pg_dir
+	to_page += ((current->start_code>>20) & 0xffc); // actually, this is pg_dir
 /* is there a page-directory at from? */
 	from = *(unsigned long *) from_page;
 	if (!(from & 1))
 		return 0;
 	from &= 0xfffff000;
-	from_page = from + ((address>>10) & 0xffc);
-	phys_addr = *(unsigned long *) from_page;
+	from_page = from + ((address>>10) & 0xffc); // this is real page_table
+	phys_addr = *(unsigned long *) from_page; // this is real page
 /* is the page clean and present? */
 	if ((phys_addr & 0x41) != 0x01)
 		return 0;
@@ -371,7 +371,7 @@ void do_no_page(unsigned long error_code,unsigned long address)
 
 	address &= 0xfffff000;
 	tmp = address - current->start_code;
-	if (!current->executable || tmp >= current->end_data) {
+	if (!current->executable || tmp >= current->end_data) { // 非可执行任务或在data区外说明不可共享page，直接加载page
 		get_empty_page(address);
 		return;
 	}

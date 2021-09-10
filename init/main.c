@@ -109,7 +109,7 @@ void main(void)		/* This really IS void, no error here. */
  */
  	ROOT_DEV = ORIG_ROOT_DEV;
  	drive_info = DRIVE_INFO;
-	memory_end = (1<<20) + (EXT_MEM_K<<10);
+	memory_end = (1<<20) + (EXT_MEM_K<<10); // 1M + 0x90002 K
 	memory_end &= 0xfffff000;
 	if (memory_end > 16*1024*1024)
 		memory_end = 16*1024*1024;
